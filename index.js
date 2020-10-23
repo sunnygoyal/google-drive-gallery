@@ -36,7 +36,7 @@ async function fetchFileList(folderId) {
     let myRequest = new CancelSignal();
     activeRequest = myRequest;
 
-    let url = `https://www.googleapis.com/drive/v2/files?q=%27${folderId}%27+in+parents&key=AIzaSyCb2e0N8IKQ5qhARrF_rZmnuOAKkUbzOrU&fields=items(id,embedLink,downloadUrl,thumbnailLink,id,title,mimeType,imageMediaMetadata(height,width),videoMediaMetadata(width,height))`
+    let url = `https://www.googleapis.com/drive/v2/files?q=%27${folderId}%27+in+parents&key=AIzaSyCb2e0N8IKQ5qhARrF_rZmnuOAKkUbzOrU&fields=items(id,embedLink,downloadUrl,thumbnailLink,id,title,mimeType,imageMediaMetadata(height,width,rotation),videoMediaMetadata(width,height))`
     // let url = `https://www.googleapis.com/drive/v2/files?q=%27${folderId}%27+in+parents&key=AIzaSyCb2e0N8IKQ5qhARrF_rZmnuOAKkUbzOrU`
     let response = await fetch(url);
     if (response.status !== 200) {
@@ -107,6 +107,12 @@ function renderContents(serverItems, basePath, title) {
         if (item.imageMediaMetadata) {
             w = item.imageMediaMetadata.width;
             h = item.imageMediaMetadata.height;
+
+            let rotation = item.imageMediaMetadata.rotation;
+            if (rotation == 1 || rotation == 3) {
+                let t = w; w = h; h = t;
+            }
+
             scale = Math.min(CARD_WIDTH / w, CARD_HEIGHT / h);
 
         } else if (item.videoMediaMetadata) {
